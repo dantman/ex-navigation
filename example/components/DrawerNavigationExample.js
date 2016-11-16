@@ -21,68 +21,89 @@ class Heading extends DrawerNavigationChild {
   }
 }
 
-export default class DrawerNavigationExample extends Component {
-
-  _renderHeader = () => {
-    return <Image source={require('../assets/sparkles.jpg')} style={styles.header} />;
-  };
-
-  _renderTitle = (text: string, isSelected: bool) => {
-    return (
-      <Text style={[styles.buttonTitleText, isSelected ? styles.selectedText : null]}>
-        {text}
-      </Text>
-    );
-  };
-
-  _renderIcon = (name: string, isSelected: bool) => {
+class DrawerItem extends DrawerNavigationItem {
+  renderIcon = (isSelected: bool) => {
     let extraStyle = {marginTop: 2};
-    if (name === 'md-alert') {
+    if (this.props.icon === 'md-alert') {
       extraStyle = {...extraStyle, marginLeft: -3};
     }
     return (
       <Ionicons
         style={[styles.icon, isSelected ? styles.selectedText : null, extraStyle]}
-        name={name}
+        name={this.props.icon}
         size={24}
       />
     );
+  };
+
+  renderTitle = (isSelected: bool) => {
+    return (
+      <Text style={[styles.buttonTitleText, isSelected ? styles.selectedText : null]}>
+        {this.props.title}
+      </Text>
+    );
+  };
+
+  get selectedItemStyle() {
+    return styles.selectedItemStyle;
+  }
+
+  get children() {
+    let { defaultRouteConfig } = this.props;
+
+    return (
+      <StackNavigation
+        id="root"
+        defaultRouteConfig={defaultRouteConfig}
+        initialRoute={Router.getRoute('home')}
+      />
+    );
+  }
+}
+
+export default class DrawerNavigationExample extends Component {
+  renderHeader = () => {
+    return <Image source={require('../assets/sparkles.jpg')} style={styles.header} />;
   };
 
   render() {
     return (
       <DrawerNavigation
         drawerPosition="right"
-        renderHeader={this._renderHeader}
+        renderHeader={this.renderHeader}
         drawerWidth={300}
         initialItem="home">
-        <DrawerNavigationItem
+        <DrawerItem
           id="home"
-          selectedStyle={styles.selectedItemStyle}
-          renderTitle={isSelected => this._renderTitle('Examples', isSelected)}
-          renderIcon={isSelected => this._renderIcon('md-apps', isSelected)}>
-          <StackNavigation
-            id="root"
-            defaultRouteConfig={{
-              navigationBar: {
-                backgroundColor: '#0084FF',
-                tintColor: '#fff',
-              },
-            }}
-            initialRoute={Router.getRoute('home')}
-          />
-        </DrawerNavigationItem>
-        <Heading title='Meta' />
-        <DrawerNavigationItem
+          icon="md-apps"
+          title="Examples"
+          defaultRouteConfig={{
+            navigationBar: {
+              backgroundColor: '#0084FF',
+              tintColor: '#fff',
+            },
+          }}
+          stack={{
+            id: 'root',
+            initialRoute: Router.getRoute('home'),
+          }}
+        />
+        <Heading title="Meta" />
+        <DrawerItem
           id="another"
-          selectedStyle={styles.selectedItemStyle}
-          renderTitle={isSelected => this._renderTitle('About', isSelected)}
-          renderIcon={isSelected => this._renderIcon('md-alert', isSelected)}>
-          <StackNavigation
-            id="about"
-            initialRoute={Router.getRoute('about')}
-          />
-        </DrawerNavigationItem>
+          icon="md-alert"
+          title="About"
+          defaultRouteConfig={{
+            navigationBar: {
+              backgroundColor: '#0084FF',
+              tintColor: '#fff',
+            },
+          }}
+          stack={{
+            id: 'root',
+            initialRoute: Router.getRoute('about'),
+          }}
+        />
       </DrawerNavigation>
     );
   }
